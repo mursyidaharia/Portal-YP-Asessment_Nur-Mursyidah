@@ -26,9 +26,9 @@ class QuestionController extends Controller
             'question_text' => 'required|string',
             'type' => 'required|in:multiple_choice,open_text',
             'marks' => 'required|integer|min:1',
-            'options' => 'required_if:type,multiple_choice|array|min:2',
-            'options.*' => 'required_if:type,multiple_choice|string',
-            'correct_option' => 'required_if:type,multiple_choice|integer',
+            'options' => 'required_if:type,multiple_choice|nullable|array|min:2',
+            'options.*' => 'required_if:type,multiple_choice|nullable|string',
+            'correct_option' => 'required_if:type,multiple_choice|nullable|integer',
         ]);
 
         $question = Question::create([

@@ -80,7 +80,7 @@
             </div>
 
             <div class="pt-2">
-                <button type="submit"
+                <button type="submit" onclick="return validateForm()"
                         class="px-4 py-2 bg-slate-800 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">
                     Save Question
                 </button>
@@ -120,5 +120,38 @@
     // Restore type on page load if validation failed
     const savedType = "{{ old('type') }}";
     if (savedType) toggleOptions(savedType);
+
+    function validateForm() {
+        const type = document.getElementById('questionType').value;
+
+        if (!type) {
+            alert('Please select a question type.');
+            return false;
+        }
+
+        if (type === 'multiple_choice') {
+            const options = document.querySelectorAll('input[name="options[]"]');
+            for (let opt of options) {
+                if (!opt.value.trim()) {
+                    alert('Please fill in all options.');
+                    return false;
+                }
+            }
+
+            const correct = document.querySelector('input[name="correct_option"]:checked');
+            if (!correct) {
+                alert('Please select the correct answer by clicking the radio button next to it.');
+                return false;
+            }
+        }
+
+        const questionText = document.querySelector('textarea[name="question_text"]').value.trim();
+        if (!questionText) {
+            alert('Please enter a question.');
+            return false;
+        }
+
+        return true;
+    }
 </script>
 @endsection

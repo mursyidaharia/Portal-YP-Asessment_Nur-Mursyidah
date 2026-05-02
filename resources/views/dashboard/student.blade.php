@@ -39,15 +39,27 @@
         </div>
         <div class="divide-y divide-slate-100">
             @forelse($availableExams as $exam)
+            @php
+                $attempt = auth()->user()->examAttempts->firstWhere('exam_id', $exam->id);
+            @endphp
             <div class="px-6 py-4 flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-slate-700">{{ $exam->title }}</p>
                     <p class="text-xs text-slate-400">{{ $exam->subject->name }} · {{ $exam->time_limit }} mins</p>
                 </div>
-                <a href="{{ route('student.exams.index') }}"
-                   class="text-xs px-3 py-1.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors">
-                    View
-                </a>
+                @if($attempt && $attempt->status === 'submitted')
+                    <span class="text-xs px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg">Completed</span>
+                @elseif($attempt && $attempt->status === 'in_progress')
+                    <a href="{{ route('student.exams.attempt', $exam) }}"
+                    class="text-xs px-3 py-1.5 bg-amber-500 text-white rounded-lg hover:bg-amber-400 transition-colors">
+                        Continue
+                    </a>
+                @else
+                    <a href="{{ route('student.exams.index') }}"
+                    class="text-xs px-3 py-1.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors">
+                        View
+                    </a>
+                @endif
             </div>
             @empty
             <div class="px-6 py-8 text-center text-sm text-slate-400">
@@ -64,6 +76,7 @@
         </div>
         <div class="divide-y divide-slate-100">
             @forelse($myAttempts as $attempt)
+            @if(!$attempt->exam) @continue @endif
             <div class="px-6 py-4 flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-slate-700">{{ $attempt->exam->title }}</p>

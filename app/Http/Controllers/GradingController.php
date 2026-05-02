@@ -14,13 +14,13 @@ class GradingController extends Controller
     {
         $exams = Exam::where('created_by', auth()->id())
             ->withCount('attempts')
-            ->with('subject')
+            ->with(['subject', 'questions', 'attempts'])
             ->latest()
             ->get();
 
         return view('lecturer.grading.index', compact('exams'));
     }
-
+    
     public function show(ExamAttempt $attempt)
     {
         $attempt->load('user', 'exam.questions.options', 'answers.selectedOption', 'answers.question');
@@ -61,6 +61,21 @@ class GradingController extends Controller
 
         AuditLogger::log('release_result', 'Released result for attempt ID: ' . $attempt->id);
 
-        return back()->with('success', 'Result released to student!');
+        return redirect()->route('lecturer.grading.show', $attempt)->with('success', 'Result released to student!');
+    }
+
+    public function bulkRelease(Exam $exam)
+    {
+        $attempts = ExamAttempt::where('exam_id', $exam->id)
+            ->where('status', 'submitted')
+            ->get();
+
+        foreach ($attempts as $attempt) {
+            $attempt->update(['is_released' => true]);
+        }
+
+        AuditLogger::log('bulk_release', 'Bulk released results for exam: ' . $exam->title);
+
+        return back()->with('success', 'All results released successfully!');
     }
 }

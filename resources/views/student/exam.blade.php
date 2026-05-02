@@ -66,14 +66,22 @@
     </div>
 </div>
 
+<form id="autoSubmitForm" method="POST" action="{{ route('student.exams.submit', $exam) }}" style="display:none">
+    @csrf
+</form>
+
 <script>
-    // Timer
-    let timeRemaining = {{ $timeRemaining }};
+    const endTime = {{ $endTime }};
+    let timeRemaining = Math.floor(endTime - (Date.now() / 1000));
 
     function updateTimer() {
-        const mins = Math.floor(timeRemaining / 60);
+        if (timeRemaining < 0) timeRemaining = 0;
+
+        const hours = Math.floor(timeRemaining / 3600);
+        const mins = Math.floor((timeRemaining % 3600) / 60);
         const secs = timeRemaining % 60;
-        const display = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+        const display = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         document.getElementById('timer').textContent = display;
 
         if (timeRemaining <= 300) {
@@ -82,26 +90,17 @@
 
         if (timeRemaining <= 0) {
             autoSubmit();
-        } else {
-            timeRemaining--;
-            setTimeout(updateTimer, 1000);
+            return;
         }
+
+        timeRemaining--;
+        setTimeout(updateTimer, 1000);
     }
 
     function autoSubmit() {
-        document.getElementById('timer').textContent = '0:00';
-        fetch('{{ route('student.exams.submit', $exam) }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'application/json'
-            }
-        }).then(() => {
-            window.location.href = '{{ route('student.history') }}';
-        });
+        document.getElementById('autoSubmitForm').submit();
     }
 
-    // Save answer via AJAX
     function saveAnswer(questionId, optionId, answerText) {
         fetch('{{ route('student.exams.answer', $exam) }}', {
             method: 'POST',

@@ -24,9 +24,23 @@
                     <td class="px-6 py-4 text-slate-500">{{ $exam->subject->name }}</td>
                     <td class="px-6 py-4 text-slate-500">{{ $exam->attempts_count }}</td>
                     <td class="px-6 py-4">
-                        <div class="flex items-center justify-end">
+                        <div class="flex items-center justify-end gap-3">
                             <a href="{{ route('lecturer.grading.index') }}?exam={{ $exam->id }}"
-                               class="text-xs text-slate-400 hover:text-slate-600 transition-colors">View Attempts</a>
+                            class="text-xs text-slate-400 hover:text-slate-600 transition-colors">View Attempts</a>
+                            @php
+                                $allMcq = $exam->questions->every(fn($q) => $q->type === 'multiple_choice');
+                                $hasAttempts = $exam->attempts_count > 0;
+                            @endphp
+                            @if($allMcq && $hasAttempts)
+                            <form method="POST" action="{{ route('lecturer.grading.bulk-release', $exam) }}">
+                                @csrf
+                                <button type="submit"
+                                        onclick="return confirm('Release all results for this exam?')"
+                                        class="text-xs text-emerald-500 hover:text-emerald-700 transition-colors">
+                                    Release All
+                                </button>
+                            </form>
+                            @endif
                         </div>
                     </td>
                 </tr>

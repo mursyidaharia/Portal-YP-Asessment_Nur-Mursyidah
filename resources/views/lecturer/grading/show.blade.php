@@ -47,7 +47,6 @@
                     </span>
                 </div>
                 <input type="hidden" name="grades[{{ $answer?->id }}]" value="{{ $answer?->marks_awarded ?? 0 }}" />
-
             @else
                 <div class="bg-slate-50 rounded-lg p-3">
                     <p class="text-xs text-slate-400 mb-1">Student's answer:</p>
@@ -66,25 +65,27 @@
         </div>
         @endforeach
 
-        <div class="flex gap-3">
-            <button type="submit"
-                    class="px-4 py-2 bg-slate-800 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">
-                Save Grades
-            </button>
-
-            @if(!$attempt->is_released)
-            <form method="POST" action="{{ route('lecturer.grading.release', $attempt) }}">
-                @csrf
-                <button type="submit"
-                        onclick="return confirm('Release result to student?')"
-                        class="px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-500 transition-colors">
-                    Release Result
-                </button>
-            </form>
-            @else
-            <span class="px-4 py-2 bg-emerald-50 text-emerald-600 text-sm rounded-lg">✓ Result Released</span>
-            @endif
-        </div>
+        <button type="submit"
+                class="px-4 py-2 bg-slate-800 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">
+            Save Grades
+        </button>
     </form>
+
+    {{-- Release Result - separate form outside save grades form --}}
+    <div class="pb-6">
+        @if(!$attempt->is_released)
+        <form method="POST" action="{{ route('lecturer.grading.release', $attempt) }}">
+            @csrf
+            <button type="submit"
+                    onclick="return confirm('Release result to student?')"
+                    class="px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-500 transition-colors">
+                Release Result
+            </button>
+        </form>
+        @else
+        <span class="px-4 py-2 bg-emerald-50 text-emerald-600 text-sm rounded-lg">✓ Result Released</span>
+        @endif
+    </div>
+
 </div>
 @endsection

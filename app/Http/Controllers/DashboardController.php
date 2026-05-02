@@ -13,7 +13,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = auth()->user()->load('examAttempts');
 
         if ($user->isLecturer()) {
             $totalStudents = User::where('role', 'student')->count();

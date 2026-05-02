@@ -67,12 +67,18 @@
 </div>
 
 <script>
-    let timeRemaining = {{ $timeRemaining }};
+    const endTime = {{ $endTime }};
+    let timeRemaining = Math.floor(endTime - (Date.now() / 1000));
 
     function updateTimer() {
-        const mins = Math.floor(timeRemaining / 60);
+        if (timeRemaining < 0) timeRemaining = 0;
+
+        const hours = Math.floor(timeRemaining / 3600);
+        const mins = Math.floor((timeRemaining % 3600) / 60);
         const secs = timeRemaining % 60;
-        document.getElementById('timer').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+        const display = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        document.getElementById('timer').textContent = display;
 
         if (timeRemaining <= 300) {
             document.getElementById('timer').classList.add('text-red-500');
@@ -80,10 +86,11 @@
 
         if (timeRemaining <= 0) {
             document.querySelector('form').submit();
-        } else {
-            timeRemaining--;
-            setTimeout(updateTimer, 1000);
+            return;
         }
+
+        timeRemaining--;
+        setTimeout(updateTimer, 1000);
     }
 
     updateTimer();

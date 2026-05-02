@@ -20,6 +20,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100">
                 @forelse($attempts as $attempt)
+                @if(!$attempt->exam) @continue @endif
                 <tr class="hover:bg-slate-50 transition-colors">
                     <td class="px-6 py-4 font-medium text-slate-700">{{ $attempt->exam->title }}</td>
                     <td class="px-6 py-4 text-slate-500">{{ $attempt->exam->subject->name }}</td>

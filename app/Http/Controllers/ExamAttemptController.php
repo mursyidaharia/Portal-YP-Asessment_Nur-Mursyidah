@@ -45,8 +45,11 @@ class ExamAttemptController extends Controller
 
         $attempt = ExamAttempt::where('user_id', $user->id)
             ->where('exam_id', $exam->id)
-            ->where('status', 'in_progress')
             ->firstOrFail();
+
+        if ($attempt->status === 'submitted') {
+            return redirect()->route('student.history')->with('info', 'You have already submitted this exam.');
+        }
 
         // Check if time is up
         $elapsed = now()->diffInMinutes($attempt->started_at);
@@ -62,9 +65,9 @@ class ExamAttemptController extends Controller
             return $question;
         });
 
-        $timeRemaining = ($exam->time_limit * 60) - now()->diffInSeconds($attempt->started_at);
+        $endTime = $attempt->started_at->addMinutes($exam->time_limit)->timestamp;
 
-        return view('student.exam', compact('exam', 'attempt', 'questions', 'timeRemaining'));
+        return view('student.exam', compact('exam', 'attempt', 'questions', 'endTime'));
     }
 
     public function saveAnswer(Request $request, Exam $exam)
@@ -102,8 +105,11 @@ class ExamAttemptController extends Controller
 
         $attempt = ExamAttempt::where('user_id', $user->id)
             ->where('exam_id', $exam->id)
-            ->where('status', 'in_progress')
             ->firstOrFail();
+
+        if ($attempt->status === 'submitted') {
+            return redirect()->route('student.history')->with('info', 'You have already submitted this exam.');
+        }
 
         // Check if time is up
         $elapsed = now()->diffInMinutes($attempt->started_at);
@@ -118,9 +124,9 @@ class ExamAttemptController extends Controller
             return $question;
         });
 
-        $timeRemaining = ($exam->time_limit * 60) - now()->diffInSeconds($attempt->started_at);
+        $endTime = $attempt->started_at->addMinutes($exam->time_limit)->timestamp;
 
-        return view('student.review', compact('exam', 'attempt', 'questions', 'timeRemaining'));
+        return view('student.review', compact('exam', 'attempt', 'questions', 'endTime'));
     }
 
     public function submit(Request $request, Exam $exam)

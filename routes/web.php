@@ -61,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('grading/{attempt}', [GradingController::class, 'show'])->name('grading.show');
         Route::post('grading/{attempt}', [GradingController::class, 'grade'])->name('grading.grade');
         Route::post('grading/{attempt}/release', [GradingController::class, 'release'])->name('grading.release');
+        Route::post('grading/{exam}/bulk-release', [GradingController::class, 'bulkRelease'])->name('grading.bulk-release');
     });
 
     // Student only routes
