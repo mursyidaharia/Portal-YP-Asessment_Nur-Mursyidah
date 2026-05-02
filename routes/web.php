@@ -42,9 +42,6 @@ Route::middleware(['auth'])->group(function () {
 
         // Student Management
         Route::get('students', [LecturerController::class, 'students'])->name('students.index');
-        Route::get('students/create', [LecturerController::class, 'createStudent'])->name('students.create');
-        Route::post('students', [LecturerController::class, 'storeStudent'])->name('students.store');
-        Route::delete('students/{user}', [LecturerController::class, 'destroyStudent'])->name('students.destroy');
 
         // Exam Management
         Route::resource('exams', ExamController::class);
