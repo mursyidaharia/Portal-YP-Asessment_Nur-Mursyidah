@@ -32,7 +32,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Lecturer only routes
-    Route::middleware(['auth'])->prefix('lecturer')->name('lecturer.')->group(function () {
+    Route::middleware(['auth', 'role:lecturer'])->prefix('lecturer')->name('lecturer.')->group(function () {
 
         // Class Management
         Route::resource('classes', ClassController::class);
@@ -64,7 +64,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Student only routes
-    Route::middleware(['auth'])->prefix('student')->name('student.')->group(function () {
+    Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
 
         // Available exams
         Route::get('exams', [StudentController::class, 'exams'])->name('exams.index');
