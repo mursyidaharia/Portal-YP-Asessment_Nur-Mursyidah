@@ -8,11 +8,11 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    public function exams()
+    public function exams(Request $request)
     {
         $user = auth()->user();
 
-        $exams = Exam::whereHas('subject.classes', function ($q) use ($user) {
+        $query = Exam::whereHas('subject.classes', function ($q) use ($user) {
             $q->whereHas('students', function ($q2) use ($user) {
                 $q2->where('users.id', $user->id);
             });
@@ -24,10 +24,23 @@ class StudentController extends Controller
                     ->where('publish_at', '<=', now());
             });
         })
-        
-        ->with('subject')
-        ->get()
-        ->map(function ($exam) use ($user) {
+        ->with('subject');
+
+        if ($request->search) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->status) {
+            if ($request->status === 'completed') {
+                $query->whereHas('attempts', fn($q) => $q->where('user_id', $user->id)->where('status', 'submitted'));
+            } elseif ($request->status === 'available') {
+                $query->whereDoesntHave('attempts', fn($q) => $q->where('user_id', $user->id));
+            } elseif ($request->status === 'expired') {
+                $query->whereNotNull('due_at')->where('due_at', '<', now());
+            }
+        }
+
+        $exams = $query->get()->map(function ($exam) use ($user) {
             $exam->attempt = ExamAttempt::where('user_id', $user->id)
                 ->where('exam_id', $exam->id)
                 ->first();
@@ -37,15 +50,26 @@ class StudentController extends Controller
         return view('student.exams', compact('exams'));
     }
 
-    public function history()
+    public function history(Request $request)
     {
         $user = auth()->user();
 
-        $attempts = ExamAttempt::where('user_id', $user->id)
+        $query = ExamAttempt::where('user_id', $user->id)
             ->where('status', 'submitted')
-            ->with('exam.subject')
-            ->latest()
-            ->get();
+            ->with('exam.subject');
+
+        if ($request->search) {
+            $query->whereHas('exam', fn($q) => $q->where('title', 'like', '%' . $request->search . '%'));
+        }
+
+        $sort = $request->sort ?? 'submitted_at';
+        $direction = $request->direction ?? 'desc';
+
+        if (in_array($sort, ['submitted_at', 'total_score'])) {
+            $query->orderBy($sort, $direction);
+        }
+
+        $attempts = $query->get();
 
         return view('student.history', compact('attempts'));
     }

@@ -10,9 +10,26 @@ use Illuminate\Http\Request;
 
 class ClassController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $classes = Classes::withCount('students')->with('subjects')->latest()->get();
+        $query = Classes::withCount('students')->with('subjects');
+
+        if ($request->search) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $sort = $request->sort ?? 'created_at';
+        $direction = $request->direction ?? 'desc';
+
+        if (in_array($sort, ['name', 'students_count', 'created_at'])) {
+            if ($sort === 'students_count') {
+                $query->orderByRaw('(SELECT COUNT(*) FROM student_class WHERE student_class.class_id = classes.id)' . ' ' . $direction);
+            } else {
+                $query->orderBy($sort, $direction);
+            }
+        }
+
+        $classes = $query->get();
         return view('lecturer.classes.index', compact('classes'));
     }
 

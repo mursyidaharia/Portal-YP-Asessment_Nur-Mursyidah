@@ -14,6 +14,28 @@
         </a>
     </div>
 
+    <!-- Search & Sort -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+        <form method="GET" action="{{ route('lecturer.subjects.index') }}" class="flex gap-3">
+            <input type="text" name="search" value="{{ request('search') }}"
+                placeholder="Search subjects..."
+                class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300" />
+            <select name="sort" class="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300">
+                <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Latest</option>
+                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name</option>
+                <option value="exams_count" {{ request('sort') == 'exams_count' ? 'selected' : '' }}>Exams</option>
+            </select>
+            <select name="direction" class="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300">
+                <option value="desc" {{ request('direction') == 'desc' ? 'selected' : '' }}>Desc</option>
+                <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>Asc</option>
+            </select>
+            <button type="submit" class="px-4 py-2 bg-slate-800 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">Search</button>
+            @if(request('search') || request('sort'))
+                <a href="{{ route('lecturer.subjects.index') }}" class="px-4 py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-colors">Clear</a>
+            @endif
+        </form>
+    </div>
+
     <!-- Table -->
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
         <table class="w-full text-sm">

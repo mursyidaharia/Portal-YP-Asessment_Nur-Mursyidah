@@ -10,13 +10,32 @@ use Illuminate\Http\Request;
 
 class GradingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $exams = Exam::where('created_by', auth()->id())
+        $query = Exam::where('created_by', auth()->id())
             ->withCount('attempts')
-            ->with(['subject', 'questions', 'attempts'])
-            ->latest()
-            ->get();
+            ->with(['subject', 'questions', 'attempts']);
+
+        if ($request->search) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->release_status) {
+            if ($request->release_status === 'released') {
+                $query->whereHas('attempts', fn($q) => $q->where('is_released', true));
+            } elseif ($request->release_status === 'pending') {
+                $query->whereHas('attempts', fn($q) => $q->where('is_released', false)->where('status', 'submitted'));
+            }
+        }
+
+        $sort = $request->sort ?? 'created_at';
+        $direction = $request->direction ?? 'desc';
+
+        if (in_array($sort, ['title', 'created_at', 'attempts_count'])) {
+            $query->orderBy($sort, $direction);
+        }
+
+        $exams = $query->latest()->get();
 
         return view('lecturer.grading.index', compact('exams'));
     }

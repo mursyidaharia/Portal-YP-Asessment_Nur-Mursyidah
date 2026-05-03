@@ -8,13 +8,24 @@ use Illuminate\Http\Request;
 
 class SubjectController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $subjects = Subject::where('created_by', auth()->id())
+        $query = Subject::where('created_by', auth()->id())
             ->withCount('exams')
-            ->with('classes')
-            ->latest()
-            ->get();
+            ->with('classes');
+
+        if ($request->search) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $sort = $request->sort ?? 'created_at';
+        $direction = $request->direction ?? 'desc';
+
+        if (in_array($sort, ['name', 'exams_count', 'created_at'])) {
+            $query->orderBy($sort, $direction);
+        }
+
+        $subjects = $query->get();
         return view('lecturer.subjects.index', compact('subjects'));
     }
 

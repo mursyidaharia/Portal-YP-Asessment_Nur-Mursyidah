@@ -14,6 +14,43 @@
         </a>
     </div>
 
+    <!-- Search & Filter -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+        <form method="GET" action="{{ route('lecturer.exams.index') }}" class="flex flex-wrap gap-3">
+            <input type="text" name="search" value="{{ request('search') }}"
+                placeholder="Search exams..."
+                class="flex-1 min-w-48 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300" />
+            <select name="subject_id" class="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300">
+                <option value="">All Subjects</option>
+                @foreach($subjects as $subject)
+                    <option value="{{ $subject->id }}" {{ request('subject_id') == $subject->id ? 'selected' : '' }}>
+                        {{ $subject->name }}
+                    </option>
+                @endforeach
+            </select>
+            <select name="status" class="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300">
+                <option value="">All Status</option>
+                <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published</option>
+                <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                <option value="scheduled" {{ request('status') == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Expired</option>
+            </select>
+            <select name="sort" class="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300">
+                <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Latest</option>
+                <option value="title" {{ request('sort') == 'title' ? 'selected' : '' }}>Title</option>
+                <option value="time_limit" {{ request('sort') == 'time_limit' ? 'selected' : '' }}>Time Limit</option>
+            </select>
+            <select name="direction" class="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300">
+                <option value="desc" {{ request('direction') == 'desc' ? 'selected' : '' }}>Desc</option>
+                <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>Asc</option>
+            </select>
+            <button type="submit" class="px-4 py-2 bg-slate-800 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">Search</button>
+            @if(request('search') || request('subject_id') || request('status') || request('sort'))
+                <a href="{{ route('lecturer.exams.index') }}" class="px-4 py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-colors">Clear</a>
+            @endif
+        </form>
+    </div>
+
     <!-- Table -->
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
         <table class="w-full text-sm">

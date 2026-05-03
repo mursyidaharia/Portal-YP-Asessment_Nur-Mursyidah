@@ -10,14 +10,45 @@ use Illuminate\Http\Request;
 
 class ExamController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $exams = Exam::where('created_by', auth()->id())
+        $query = Exam::where('created_by', auth()->id())
             ->with('subject')
-            ->withCount('questions')
-            ->latest()
-            ->get();
-        return view('lecturer.exams.index', compact('exams'));
+            ->withCount('questions');
+
+        if ($request->search) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->subject_id) {
+            $query->where('subject_id', $request->subject_id);
+        }
+
+        if ($request->status) {
+            if ($request->status === 'published') {
+                $query->where('is_published', true)->where(function($q) {
+                    $q->whereNull('due_at')->orWhere('due_at', '>=', now());
+                });
+            } elseif ($request->status === 'draft') {
+                $query->where('is_published', false)->whereNull('publish_at');
+            } elseif ($request->status === 'scheduled') {
+                $query->where('is_published', false)->whereNotNull('publish_at')->where('publish_at', '>', now());
+            } elseif ($request->status === 'expired') {
+                $query->whereNotNull('due_at')->where('due_at', '<', now());
+            }
+        }
+
+        $sort = $request->sort ?? 'created_at';
+        $direction = $request->direction ?? 'desc';
+
+        if (in_array($sort, ['title', 'time_limit', 'created_at'])) {
+            $query->orderBy($sort, $direction);
+        }
+
+        $exams = $query->get();
+        $subjects = Subject::where('created_by', auth()->id())->get();
+
+        return view('lecturer.exams.index', compact('exams', 'subjects'));
     }
 
     public function create()

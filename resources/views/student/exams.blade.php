@@ -7,6 +7,25 @@
 
     <h2 class="text-base font-semibold text-slate-700">Available Exams</h2>
 
+    <!-- Search & Filter -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+        <form method="GET" action="{{ route('student.exams.index') }}" class="flex gap-3">
+            <input type="text" name="search" value="{{ request('search') }}"
+                placeholder="Search exams..."
+                class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300" />
+            <select name="status" class="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300">
+                <option value="">All</option>
+                <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available</option>
+                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Expired</option>
+            </select>
+            <button type="submit" class="px-4 py-2 bg-slate-800 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">Search</button>
+            @if(request('search') || request('status'))
+                <a href="{{ route('student.exams.index') }}" class="px-4 py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50 transition-colors">Clear</a>
+            @endif
+        </form>
+    </div>
+
     <div class="space-y-3">
         @forelse($exams as $exam)
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
