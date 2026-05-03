@@ -17,7 +17,14 @@ class StudentController extends Controller
                 $q2->where('users.id', $user->id);
             });
         })
-        ->where('is_published', true)
+        ->where(function($q) {
+            $q->where('is_published', true)
+            ->orWhere(function($q2) {
+                $q2->whereNotNull('publish_at')
+                    ->where('publish_at', '<=', now());
+            });
+        })
+        
         ->with('subject')
         ->get()
         ->map(function ($exam) use ($user) {

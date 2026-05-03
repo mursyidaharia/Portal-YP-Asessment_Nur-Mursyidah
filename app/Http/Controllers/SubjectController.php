@@ -10,7 +10,11 @@ class SubjectController extends Controller
 {
     public function index()
     {
-        $subjects = Subject::withCount('exams')->with('classes')->latest()->get();
+        $subjects = Subject::where('created_by', auth()->id())
+            ->withCount('exams')
+            ->with('classes')
+            ->latest()
+            ->get();
         return view('lecturer.subjects.index', compact('subjects'));
     }
 
@@ -22,10 +26,13 @@ class SubjectController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:subjects,name',
+            'name' => 'required|string|max:255',
         ]);
 
-        $subject = Subject::create(['name' => $request->name]);
+        $subject = Subject::create([
+            'name' => $request->name,
+            'created_by' => auth()->id(),
+        ]);
 
         AuditLogger::log('create_subject', 'Created subject: ' . $subject->name);
 
@@ -34,11 +41,18 @@ class SubjectController extends Controller
 
     public function edit(Subject $subject)
     {
+        if ($subject->created_by !== auth()->id()) {
+            abort(403);
+        }
         return view('lecturer.subjects.edit', compact('subject'));
     }
 
     public function update(Request $request, Subject $subject)
     {
+        if ($subject->created_by !== auth()->id()) {
+            abort(403);
+        }
+
         $request->validate([
             'name' => 'required|string|max:255|unique:subjects,name,' . $subject->id,
         ]);
@@ -52,6 +66,10 @@ class SubjectController extends Controller
 
     public function destroy(Subject $subject)
     {
+        if ($subject->created_by !== auth()->id()) {
+            abort(403);
+        }
+
         AuditLogger::log('delete_subject', 'Deleted subject: ' . $subject->name);
         $subject->delete();
         return redirect()->route('lecturer.subjects.index')->with('success', 'Subject deleted successfully!');

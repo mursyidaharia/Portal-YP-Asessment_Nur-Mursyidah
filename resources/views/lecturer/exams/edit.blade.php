@@ -43,6 +43,26 @@
                 @error('time_limit')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
             </div>
 
+            <!-- Scheduled Publish -->
+            <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Scheduled Publish Date & Time <span class="text-slate-400">(optional)</span></label>
+                <input type="datetime-local" name="publish_at"
+                    value="{{ old('publish_at', $exam->publish_at?->format('Y-m-d\TH:i')) }}"
+                    class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300" />
+                <p class="text-xs text-slate-400 mt-1">Leave empty to publish manually.</p>
+                @error('publish_at')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+            </div>
+
+            <!-- Due Date -->
+            <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Due Date & Time <span class="text-slate-400">(optional)</span></label>
+                <input type="datetime-local" name="due_at"
+                    value="{{ old('due_at', $exam->due_at?->format('Y-m-d\TH:i')) }}"
+                    class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300" />
+                <p class="text-xs text-slate-400 mt-1">Students cannot attempt after this date.</p>
+                @error('due_at')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+            </div>
+
             <div class="pt-2">
                 <button type="submit"
                         class="px-4 py-2 bg-slate-800 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">

@@ -25,7 +25,17 @@ class GradingController extends Controller
     {
         $attempt->load('user', 'exam.questions.options', 'answers.selectedOption', 'answers.question');
 
-        return view('lecturer.grading.show', compact('attempt'));
+        // Get all attempts for this exam for navigation
+        $allAttempts = ExamAttempt::where('exam_id', $attempt->exam_id)
+            ->where('status', 'submitted')
+            ->with('user')
+            ->get();
+
+        $currentIndex = $allAttempts->search(fn($a) => $a->id === $attempt->id);
+        $prevAttempt = $currentIndex > 0 ? $allAttempts[$currentIndex - 1] : null;
+        $nextAttempt = $currentIndex < $allAttempts->count() - 1 ? $allAttempts[$currentIndex + 1] : null;
+
+        return view('lecturer.grading.show', compact('attempt', 'allAttempts', 'prevAttempt', 'nextAttempt'));
     }
 
     public function grade(Request $request, ExamAttempt $attempt)
@@ -69,6 +79,18 @@ class GradingController extends Controller
         $attempts = ExamAttempt::where('exam_id', $exam->id)
             ->where('status', 'submitted')
             ->get();
+
+        // Check if all open text questions have been graded
+        foreach ($attempts as $attempt) {
+            $openTextAnswers = $attempt->answers()
+                ->whereHas('question', fn($q) => $q->where('type', 'open_text'))
+                ->whereNull('marks_awarded')
+                ->count();
+
+            if ($openTextAnswers > 0) {
+                return back()->with('error', 'Some open text answers have not been graded yet. Please grade all answers before releasing.');
+            }
+        }
 
         foreach ($attempts as $attempt) {
             $attempt->update(['is_released' => true]);

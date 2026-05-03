@@ -5,7 +5,26 @@
 @section('content')
 <div class="max-w-2xl space-y-4">
 
-    <a href="{{ route('lecturer.grading.index') }}" class="text-xs text-slate-400 hover:text-slate-600">← Back to Grading</a>
+    <div class="flex items-center justify-between">
+        <a href="{{ route('lecturer.grading.index') }}" class="text-xs text-slate-400 hover:text-slate-600">← Back to Grading</a>
+        <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-400">
+                Student {{ $allAttempts->search(fn($a) => $a->id === $attempt->id) + 1 }} of {{ $allAttempts->count() }}
+            </span>
+            @if($prevAttempt)
+                <a href="{{ route('lecturer.grading.show', $prevAttempt) }}"
+                class="text-xs px-3 py-1.5 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+                    ← Previous
+                </a>
+            @endif
+            @if($nextAttempt)
+                <a href="{{ route('lecturer.grading.show', $nextAttempt) }}"
+                class="text-xs px-3 py-1.5 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+                    Next →
+                </a>
+            @endif
+        </div>
+    </div>
 
     <div class="bg-white rounded-xl border border-slate-200 p-6 space-y-2">
         <h2 class="text-base font-semibold text-slate-700">{{ $attempt->exam->title }}</h2>
@@ -65,10 +84,16 @@
         </div>
         @endforeach
 
+        @if(!$attempt->is_released)
         <button type="submit"
                 class="px-4 py-2 bg-slate-800 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">
             Save Grades
         </button>
+        @else
+        <span class="px-4 py-2 bg-slate-100 text-slate-400 text-sm rounded-lg cursor-not-allowed">
+            Grades Locked — Result Released
+        </span>
+        @endif
     </form>
 
     {{-- Release Result - separate form outside save grades form --}}

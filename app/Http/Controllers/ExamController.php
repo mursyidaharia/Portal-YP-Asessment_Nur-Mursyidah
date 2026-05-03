@@ -22,7 +22,7 @@ class ExamController extends Controller
 
     public function create()
     {
-        $subjects = Subject::all();
+        $subjects = Subject::where('created_by', auth()->id())->get();
         return view('lecturer.exams.create', compact('subjects'));
     }
 
@@ -40,11 +40,21 @@ class ExamController extends Controller
             'time_limit' => $request->time_limit,
             'created_by' => auth()->id(),
             'is_published' => false,
+            'publish_at' => $request->publish_at ?: null,
+            'due_at' => $request->due_at ?: null,
         ]);
 
         AuditLogger::log('create_exam', 'Created exam: ' . $exam->title);
 
         return redirect()->route('lecturer.exams.questions.index', $exam)->with('success', 'Exam created! Now add questions.');
+        
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'subject_id' => 'required|exists:subjects,id',
+            'time_limit' => 'required|integer|min:1',
+            'publish_at' => 'nullable|date',
+            'due_at' => 'nullable|date|after:publish_at',
+        ]);
     }
 
     public function show(Exam $exam)
@@ -55,7 +65,7 @@ class ExamController extends Controller
 
     public function edit(Exam $exam)
     {
-        $subjects = Subject::all();
+        $subjects = Subject::where('created_by', auth()->id())->get();
         return view('lecturer.exams.edit', compact('exam', 'subjects'));
     }
 
@@ -71,11 +81,21 @@ class ExamController extends Controller
             'title' => $request->title,
             'subject_id' => $request->subject_id,
             'time_limit' => $request->time_limit,
+            'publish_at' => $request->publish_at ?: null,
+            'due_at' => $request->due_at ?: null,
         ]);
 
         AuditLogger::log('update_exam', 'Updated exam: ' . $exam->title);
 
         return redirect()->route('lecturer.exams.index')->with('success', 'Exam updated successfully!');
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'subject_id' => 'required|exists:subjects,id',
+            'time_limit' => 'required|integer|min:1',
+            'publish_at' => 'nullable|date',
+            'due_at' => 'nullable|date|after:publish_at',
+        ]);
     }
 
     public function destroy(Exam $exam)

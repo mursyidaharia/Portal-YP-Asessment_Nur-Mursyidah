@@ -70,7 +70,12 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    @forelse($selectedExam->attempts()->with('user')->where('status', 'submitted')->get() as $attempt)
+                    @php
+                        $submittedAttempts = $selectedExam->attempts()->with('user')->where('status', 'submitted')->get();
+                        $allGraded = $submittedAttempts->every(fn($a) => $a->total_score !== null);
+                        $allReleased = $submittedAttempts->every(fn($a) => $a->is_released);
+                    @endphp
+                    @forelse($submittedAttempts as $attempt)
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4 font-medium text-slate-700">{{ $attempt->user->name }}</td>
                         <td class="px-6 py-4 text-slate-500">{{ $attempt->submitted_at?->format('d M Y, h:i A') }}</td>
@@ -94,6 +99,18 @@
                 </tbody>
             </table>
         </div>
+        @if(!$allReleased && $submittedAttempts->count() > 0)
+        <div class="px-6 py-4 border-t border-slate-100 flex justify-end">
+            <form method="POST" action="{{ route('lecturer.grading.bulk-release', $selectedExam) }}">
+                @csrf
+                <button type="submit"
+                        onclick="return confirm('Release all results for this exam?')"
+                        class="text-xs px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition-colors">
+                    Release All Results
+                </button>
+            </form>
+        </div>
+        @endif
     </div>
     @endif
     @endif

@@ -7,26 +7,26 @@
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
             <p class="text-xs text-slate-400 uppercase tracking-wide">Total Students</p>
             <p class="text-3xl font-semibold text-slate-700 mt-1">{{ $totalStudents }}</p>
         </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
             <p class="text-xs text-slate-400 uppercase tracking-wide">Total Classes</p>
             <p class="text-3xl font-semibold text-slate-700 mt-1">{{ $totalClasses }}</p>
         </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
             <p class="text-xs text-slate-400 uppercase tracking-wide">Total Subjects</p>
             <p class="text-3xl font-semibold text-slate-700 mt-1">{{ $totalSubjects }}</p>
         </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
             <p class="text-xs text-slate-400 uppercase tracking-wide">My Exams</p>
             <p class="text-3xl font-semibold text-slate-700 mt-1">{{ $totalExams }}</p>
         </div>
     </div>
 
     <!-- Recent Attempts -->
-    <div class="bg-white rounded-xl border border-slate-200">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
         <div class="px-6 py-4 border-b border-slate-100">
             <h2 class="text-sm font-semibold text-slate-700">Recent Exam Attempts</h2>
         </div>

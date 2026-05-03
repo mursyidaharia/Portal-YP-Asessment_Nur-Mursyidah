@@ -9,23 +9,28 @@
 
     <div class="space-y-3">
         @forelse($exams as $exam)
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
             <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-sm font-medium text-slate-700">{{ $exam->title }}</h3>
                     <p class="text-xs text-slate-400 mt-1">{{ $exam->subject->name }} · {{ $exam->time_limit }} mins</p>
+                    @if($exam->due_at)
+                    <p class="text-xs mt-1 {{ $exam->isExpired() ? 'text-red-400' : 'text-slate-400' }}">
+                        Due: {{ $exam->due_at->format('d M Y, h:i A') }}
+                    </p>
+                    @endif
                 </div>
                 <div>
-                    @if($exam->attempt)
+                    @if($exam->isExpired())
+                        <span class="text-xs px-3 py-1.5 bg-red-50 text-red-400 rounded-lg">Expired</span>
+                    @elseif($exam->attempt)
                         @if($exam->attempt->status === 'in_progress')
                             <a href="{{ route('student.exams.attempt', $exam) }}"
                                class="text-xs px-3 py-1.5 bg-amber-500 text-white rounded-lg hover:bg-amber-400 transition-colors">
                                 Continue
                             </a>
                         @else
-                            <span class="text-xs px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg">
-                                Completed
-                            </span>
+                            <span class="text-xs px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg">Completed</span>
                         @endif
                     @else
                         <form method="POST" action="{{ route('student.exams.start', $exam) }}">
@@ -41,7 +46,7 @@
             </div>
         </div>
         @empty
-        <div class="bg-white rounded-xl border border-slate-200 px-6 py-12 text-center">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm px-6 py-12 text-center">
             <p class="text-slate-400 text-sm">No exams available at the moment.</p>
         </div>
         @endforelse

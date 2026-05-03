@@ -10,7 +10,7 @@ class Subject extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'created_by'];
 
     public function classes()
     {
@@ -20,5 +20,10 @@ class Subject extends Model
     public function exams()
     {
         return $this->hasMany(Exam::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

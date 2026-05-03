@@ -6,13 +6,13 @@
 <div class="space-y-6">
 
     <!-- Welcome -->
-    <div class="bg-white rounded-xl border border-slate-200 p-6">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
         <h2 class="text-lg font-semibold text-slate-700">Welcome back, {{ auth()->user()->name }}! 👋</h2>
         <p class="text-sm text-slate-400 mt-1">Here's an overview of your exams.</p>
     </div>
 
     <!-- My Classes -->
-    <div class="bg-white rounded-xl border border-slate-200">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
         <div class="px-6 py-4 border-b border-slate-100">
             <h2 class="text-sm font-semibold text-slate-700">My Classes</h2>
         </div>
@@ -21,7 +21,17 @@
             <div class="px-6 py-4">
                 <p class="text-sm font-medium text-slate-700">{{ $class->name }}</p>
                 <p class="text-xs text-slate-400 mt-1">
-                    Subjects: {{ $class->subjects->pluck('name')->join(', ') ?: 'None assigned' }}
+                    @if($class->subjects->count() > 0)
+                        @foreach($class->subjects as $subject)
+                            <span class="inline-block">{{ $subject->name }}
+                                @if($subject->creator)
+                                    <span class="text-slate-300">({{ $subject->creator->name }})</span>
+                                @endif
+                            </span>@if(!$loop->last), @endif
+                        @endforeach
+                    @else
+                        No subjects assigned
+                    @endif
                 </p>
             </div>
             @empty
@@ -33,7 +43,7 @@
     </div>
 
     <!-- Available Exams -->
-    <div class="bg-white rounded-xl border border-slate-200">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
         <div class="px-6 py-4 border-b border-slate-100">
             <h2 class="text-sm font-semibold text-slate-700">Available Exams</h2>
         </div>
@@ -70,7 +80,7 @@
     </div>
 
     <!-- Recent Attempts -->
-    <div class="bg-white rounded-xl border border-slate-200">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
         <div class="px-6 py-4 border-b border-slate-100">
             <h2 class="text-sm font-semibold text-slate-700">Recent Attempts</h2>
         </div>

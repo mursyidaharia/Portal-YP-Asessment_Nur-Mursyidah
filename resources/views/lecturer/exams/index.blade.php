@@ -31,13 +31,13 @@
                 @forelse($exams as $exam)
                 <tr class="hover:bg-slate-50 transition-colors">
                     <td class="px-6 py-4 font-medium text-slate-700">{{ $exam->title }}</td>
-                    <td class="px-6 py-4 text-slate-500">{{ $exam->subject->name }}</td>
+                    <td class="px-6 py-4 text-slate-500">{{ $exam->subject?->name ?? '-' }}</td>
                     <td class="px-6 py-4 text-slate-500">{{ $exam->time_limit }} mins</td>
                     <td class="px-6 py-4 text-slate-500">{{ $exam->questions_count }}</td>
                     <td class="px-6 py-4">
                         <span class="text-xs px-2 py-1 rounded-full
-                            {{ $exam->is_published ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500' }}">
-                            {{ $exam->is_published ? 'Published' : 'Draft' }}
+                            {{ $exam->isExpired() ? 'bg-red-50 text-red-500' : ($exam->isScheduled() ? 'bg-amber-50 text-amber-600' : ($exam->is_published ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500')) }}">
+                            {{ $exam->isExpired() ? 'Expired' : ($exam->isScheduled() ? 'Scheduled' : ($exam->is_published ? 'Published' : 'Draft')) }}
                         </span>
                     </td>
                     <td class="px-6 py-4">

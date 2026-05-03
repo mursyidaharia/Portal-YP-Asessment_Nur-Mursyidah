@@ -34,7 +34,7 @@ class DashboardController extends Controller
         }
 
         // Student dashboard
-        $myClasses = $user->classes()->with('subjects')->get();
+        $myClasses = $user->classes()->with('subjects.creator')->get();
         $availableExams = Exam::whereHas('subject.classes', function ($q) use ($user) {
             $q->whereHas('students', function ($q2) use ($user) {
                 $q2->where('users.id', $user->id);
